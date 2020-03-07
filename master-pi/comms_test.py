@@ -3,7 +3,7 @@
 import serial
 
 # open serial in non-blocking mode
-s = serial.Serial('/dev/ttyACM0', 9600, timeout=0)
+s = serial.Serial('/dev/ttyACM0', 115200)
 
 while True:
-    print(s.readline())
+    print(s.read_until(b'\xfa'))
