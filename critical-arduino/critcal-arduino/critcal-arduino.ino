@@ -17,8 +17,7 @@ bool levitation_valve_opened;
 bool high_speed_solenoid_engaged;
 bool low_speed_solenoid_engaged;
 
-bool newData = false;
-int state;
+byte state;
 char out;
 
 const int imu2Pin = A0; // change based on which port sensor is plugged in to
@@ -29,17 +28,14 @@ void setup() {
   pinMode(thrustValvePin, OUTPUT);
   pinMode(levValvePin, OUTPUT);
   //pinMode(imu2pin, INPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop() {
   if (Serial.available()) {
     state = Serial.read(); // read state from RPi over serial
-    newData = true;        // set flag to allow Arduino to process new data
-    Serial.print("/nCurrent state: ");
-    Serial.println(state);
   }
-  imu2Value = analogRead(imu2Pin); // read in values from imu2
+  //imu2Value = analogRead(imu2Pin); // read in values from imu2
 
   // State machine
   switch (state) {
@@ -83,10 +79,8 @@ void loop() {
     break;  
   }
   imu2();
-  out = send();
-  Serial.println(out); // data that is being sent to RPi
-  newData = false;     // clear newData flag
-  delay(200); // delay .2 seconds --> change delay value based on RPi update speed
+  send();
+  delay(20); // delay .2 seconds --> change delay value based on RPi update speed
 }
 
 /*
@@ -112,23 +106,25 @@ char send()
 }
 */
 
-void send(){
-  Serial.print("/nAcceleration_x: ");
-  Serial.println(imu2_accel_x);
-  Serial.print("/nAcceleration_y: ");
-  Serial.println(imu2_accel_y);
-  Serial.print("/nAcceleration_z: ");
-  Serial.println(imu2_accel_z);
-  Serial.print("/nGyro_x: ");
-  Serial.println(imu2_gyro_x);
-  Serial.print("/nGyro_y: ");
-  Serial.println(imu2_gyro_y);
-  Serial.print("/nGyro_z: ");
-  Serial.println(imu2_gyro_z);
+void send() {
+  Serial.write(0xaf);
+  Serial.print("critical-arduino,");
+  Serial.print("" + String(state) + ",");
+  Serial.print("" + String(imu2_accel_x, 4) + ",");
+  Serial.print("" + String(imu2_accel_y, 4) + ",");
+  Serial.print("" + String(imu2_accel_z, 4) + ",");
+  Serial.print("" + String(imu2_gyro_x, 4) + ",");
+  Serial.print("" + String(imu2_gyro_y, 4) + ",");
+  Serial.print("" + String(imu2_gyro_z, 4) + ",");
+  Serial.print("" + String(thrust_valve_opened) + ",");
+  Serial.print("" + String(levitation_valve_opened) + ",");
+  Serial.print("" + String(high_speed_solenoid_engaged) + ",");
+  Serial.print("" + String(low_speed_solenoid_engaged));
+  Serial.write(0xfa);
 }
 
 void imu2()
  // gather data from imu about acceleration and gyro
 {
-  imu2data = analogread(imu2Pin);
+  imu2data = analogRead(imu2Pin);
 }
