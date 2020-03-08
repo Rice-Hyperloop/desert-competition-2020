@@ -42,7 +42,8 @@ class Arduino:
 
             if name == 'critical-arduino':
                 data = {
-                        'state': State(int(fields[1])),
+                        'name': name,
+                        'state': State(int(fields[1])).name,
                         'imu2_accel_x': float(fields[2]),
                         'imu2_accel_y': float(fields[3]),
                         'imu2_accel_z': float(fields[4]),
@@ -52,15 +53,18 @@ class Arduino:
                         'thrust_valve_opened': bool(int(fields[8])),
                         'levitation_valve_opened': bool(int(fields[9])),
                         'high_speed_solenoid_engaged': bool(int(fields[10])),
-                        'low_speed_solenoid_engaged': bool(int(fields[11]))
+                        'low_speed_solenoid_engaged': bool(int(fields[11])),
+                        'millis': int(fields[12])
                 }
                 return data
+            else:
+                return None
         except:
             print('parse error: ' + str(sys.exc_info()))
-            return {}
+            return None
 
-    def write(self, data):
-        self.serial.write(data)
+    def set_state(self, state):
+        self.serial.write(bytearray([state.value]))
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.serial.close()

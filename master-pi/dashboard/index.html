@@ -1,1 +1,36 @@
-hello
+<html>
+    <head>
+        <title>Rice Hyperloop Pod</title>
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <div class="panel">
+            <h3>Critical Arduino Data</h3>
+            <div>state<input id="state" value="N/A" readonly></div>
+            <div>accel_x<input id="imu2_accel_x" value="N/A" readonly></div>
+            <div>accel_y<input id="imu2_accel_y" value="N/A" readonly></div>
+            <div>accel_z<input id="imu2_accel_z" value="N/A" readonly></div>
+            <div>accel_z<input id="millis" value="N/A" readonly></div>
+        </div>
+        <div class="panel">
+			<h3>Control</h3>
+			<button class="estop button"
+					onclick="sendCommand({name: 'estop'})">
+					ESTOP
+			</button>
+			<button class="button"
+					onclick="sendCommand({name: 'arm'})">
+					arm
+			</button>
+			<button class="button"
+					onclick="sendCommand({name: 'launch'})">
+					launch
+			</button>
+			<button class="button"
+					onclick="sendCommand({name: 'abort'})">
+					abort
+			</button>
+		</div>
+	<script type="text/javascript" src="main.js"></script>
+    </body>
+</html>

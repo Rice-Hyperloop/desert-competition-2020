@@ -1,0 +1,18 @@
+.panel {
+	display: flex;
+	flex-direction: column;	
+}
+
+.panel input {
+	width: fit-content;
+}
+
+.button {
+	font-size: 2em;
+	width: 5em;
+}
+
+.estop {
+	background: red;
+	color: white;
+}

@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from os.path import join, realpath
+from os.path import join, realpath, exists, splitext
 from command_fifo import CommandFIFOWriter
+from collections import defaultdict
 import sys
 
 root_path = realpath(sys.path[0])
@@ -14,15 +15,32 @@ def write_command(command):
     with CommandFIFOWriter(command_fifo_path) as command_fifo:
         command_fifo.write_command(command)
 
+content_types = defaultdict(lambda: 'text/plain')
+content_types['.js'] = 'text/javascript'
+content_types['.css'] = 'text/css'
+content_types['.html'] = 'text/html'
+content_types['.json'] = 'application/json'
+
 class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
-            self.handle_dashboard()
-        elif self.path == '/data.json':
-            self.handle_data()
-        else:
+            self.path = '/index.html'
+
+        file_path = join(root_path, 'dashboard') + self.path
+        print('accessing...' + file_path)
+
+        if not exists(file_path):
             self.send_response(404)
             self.end_headers()
+            return
+
+        with open(file_path, 'rb') as file:
+            self.send_response(200)
+            _, ext = splitext(file_path)
+            content_type = content_types[ext];
+            self.send_header('Content-Type', content_type)
+            self.end_headers()
+            self.wfile.write(file.read())
 
     def handle_data(self):
         self.send_response(200)
